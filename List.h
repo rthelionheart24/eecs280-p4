@@ -43,7 +43,7 @@ public:
   //EFFECTS:  returns true if the list is empty
   bool empty() const
   {
-    return (first == nullptr) && (last == nullptr);
+    return first == nullptr;
   }
 
   //EFFECTS: returns the number of elements in this List
@@ -51,7 +51,11 @@ public:
   {
     if (empty())
       return 0;
-    return last - first + 1;
+    int count = 0;
+    for (Node *np = first; np; np = np->next)
+      count++;
+
+    return count;
   }
 
   //REQUIRES: list is not empty
@@ -75,16 +79,20 @@ public:
   //EFFECTS:  inserts datum into the front of the list
   void push_front(const T &datum)
   {
-    Node new_node = {first, nullptr, datum};
+    Node *new_node = new Node;
+    new_node->datum = datum;
+    new_node->prev = nullptr;
+    new_node->next = nullptr;
     if (empty())
     {
-      first = &new_node;
+      first = new_node;
       last = first;
     }
     else
     {
-      first->prev = &new_node;
-      first = first->prev;
+      new_node->next = first;
+      first->prev = new_node;
+      first = new_node;
     }
   }
 
@@ -92,17 +100,21 @@ public:
   void push_back(const T &datum)
   {
     {
-      Node new_node = {nullptr, last, datum};
-      if (empty())
+      Node *new_node = new Node;
+      new_node->datum = datum;
+      new_node->next = nullptr;
+      new_node->prev = nullptr;
 
+      if (empty())
       {
-        last = &new_node;
+        last = new_node;
         first = last;
       }
       else
       {
-        last->next = &new_node;
-        last = last->next;
+        new_node->prev = last;
+        last->next = new_node;
+        last = new_node;
       }
     }
   }
@@ -116,8 +128,9 @@ public:
     Node *n = first;
     if (size() > 1)
     {
-      first = first->next;
+      first = n->next;
       delete n;
+      first->prev = nullptr;
     }
     else
     {
@@ -137,8 +150,9 @@ public:
     if (size() > 1)
     {
 
-      last = last->prev;
+      last = n->prev;
       delete n;
+      last->next = nullptr;
     }
     else
     {
@@ -188,6 +202,7 @@ public:
   ////////////////////////////////////////
   class Iterator
   {
+    friend class List;
     //OVERVIEW: Iterator interface to List
 
     // You should add in a default constructor, destructor, copy constructor,
@@ -199,9 +214,54 @@ public:
     // ++ (prefix), default constructor, == and !=.
 
   public:
-    Iterator();
-    ~Iterator();
-    Iterator(const &Iterator I);
+    // //Default ctor
+    // Iterator() : node_ptr(nullptr) {}
+
+    // Iterator(const Iterator &other) : node_ptr(other.node_ptr) {}
+
+    // //Destructor
+    // ~Iterator()
+    // {
+    //   delete node_ptr;
+    // }
+
+    // //Assignment operator
+    // Iterator &operator=(const Iterator &rhs)
+    // {
+    //   if (this == &rhs)
+    //     return *this;
+
+    //   delete this->node_ptr;
+    //   this->node_ptr = rhs.node_ptr;
+    //   return *this;
+    // }
+
+    //Dereference symbol
+    T &operator*()
+    {
+      assert(node_ptr);
+      return node_ptr->datum;
+    }
+
+    //Get the next iterator
+    Iterator &operator++()
+    {
+      assert(node_ptr);
+      node_ptr = node_ptr->next;
+      return *this;
+    }
+
+    //See if two iterators are pointing at the same node
+    bool operator==(Iterator rhs) const
+    {
+      return node_ptr == rhs.node_ptr;
+    }
+
+    //See if two iterators are pointing at different nodes
+    bool operator!=(Iterator rhs) const
+    {
+      return node_ptr != rhs.node_ptr;
+    }
 
     // This operator will be used to test your code. Do not modify it.
     // Requires that the current element is dereferenceable.
@@ -219,7 +279,7 @@ public:
     // add any friend declarations here
 
     // construct an Iterator at a specific position
-    Iterator(Node *p);
+    Iterator(Node *p) : node_ptr(p) {}
 
   }; //List::Iterator
   ////////////////////////////////////////
@@ -233,7 +293,8 @@ public:
   // return an Iterator pointing to "past the end"
   Iterator end() const
   {
-    return Iterator(last->next); //need some work
+
+    return Iterator(last->next);
   }
 
   //REQUIRES: i is a valid, dereferenceable iterator associated with this list
@@ -241,14 +302,50 @@ public:
   //EFFECTS: Removes a single element from the list container
   void erase(Iterator i)
   {
-    typename List<T>::Node p = (i.node_ptr)->prev;
-    typename List<T>::Node n = (i.node_ptr)->next;
+    if (i.node_ptr == first)
+    {
+      first = first->next;
+      first->prev = nullptr;
+    }
+    else if (i.node_ptr == nullptr)
+    {
+      last = last->prev;
+      last->next = nullptr;
+    }
+    else
+    {
+      Node *p = (i.node_ptr)->prev;
+      Node *n = (i.node_ptr)->next;
+      //delete i.node_ptr;
+      p->next = n;
+      n->prev = p;
+    }
   }
 
   //REQUIRES: i is a valid iterator associated with this list
   //EFFECTS: inserts datum before the element at the specified position.
   void insert(Iterator i, const T &datum)
   {
+    if (i.node_ptr == first)
+    {
+      push_front(datum);
+    }
+    else if (i.node_ptr == nullptr)
+    {
+      push_back(datum);
+    }
+    else
+    {
+      Node *p = (i.node_ptr)->prev;
+      Node *n = (i.node_ptr)->next;
+      Node new_node;
+      new_node.datum = datum;
+      new_node.next = i.node_ptr;
+      new_node.prev = i.node_ptr->prev;
+
+      p->next = &new_node;
+      n->prev = &new_node;
+    }
   }
 
 }; //List
