@@ -99,23 +99,21 @@ public:
   //EFFECTS:  inserts datum into the back of the list
   void push_back(const T &datum)
   {
-    {
-      Node *new_node = new Node;
-      new_node->datum = datum;
-      new_node->next = nullptr;
-      new_node->prev = nullptr;
+    Node *new_node = new Node;
+    new_node->datum = datum;
+    new_node->next = nullptr;
+    new_node->prev = nullptr;
 
-      if (empty())
-      {
-        last = new_node;
-        first = last;
-      }
-      else
-      {
-        new_node->prev = last;
-        last->next = new_node;
-        last = new_node;
-      }
+    if (empty())
+    {
+      last = new_node;
+      first = last;
+    }
+    else
+    {
+      new_node->prev = last;
+      last->next = new_node;
+      last = new_node;
     }
   }
 
