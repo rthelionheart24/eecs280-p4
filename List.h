@@ -293,6 +293,8 @@ public:
   // return an Iterator pointing to "past the end"
   Iterator end() const
   {
+    if (empty())
+      return Iterator(nullptr);
 
     return Iterator(last->next);
   }
@@ -302,23 +304,32 @@ public:
   //EFFECTS: Removes a single element from the list container
   void erase(Iterator i)
   {
-    if (i.node_ptr == first)
+
+    if (size() == 1)
     {
-      first = first->next;
-      first->prev = nullptr;
-    }
-    else if (i.node_ptr == nullptr)
-    {
-      last = last->prev;
-      last->next = nullptr;
+      first = nullptr;
+      last = nullptr;
     }
     else
     {
-      Node *p = (i.node_ptr)->prev;
-      Node *n = (i.node_ptr)->next;
-      //delete i.node_ptr;
-      p->next = n;
-      n->prev = p;
+      if (i.node_ptr == first)
+      {
+        first = first->next;
+        first->prev = nullptr;
+      }
+      else if (i.node_ptr == nullptr)
+      {
+        last = last->prev;
+        last->next = nullptr;
+      }
+      else
+      {
+        Node *p = (i.node_ptr)->prev;
+        Node *n = (i.node_ptr)->next;
+        //delete i.node_ptr;
+        p->next = n;
+        n->prev = p;
+      }
     }
   }
 
