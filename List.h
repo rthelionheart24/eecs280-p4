@@ -94,8 +94,7 @@ public:
       first->prev = new_node;
       first = new_node;
     }
-
-    delete new_node;
+    new_node = nullptr;
   }
 
   //EFFECTS:  inserts datum into the back of the list
@@ -117,8 +116,7 @@ public:
       last->next = new_node;
       last = new_node;
     }
-
-    delete new_node;
+    new_node = nullptr;
   }
 
   //REQUIRES: list is not empty
