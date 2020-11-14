@@ -7,25 +7,64 @@ using namespace std;
 
 // Add your test cases here
 
-TEST(test_push_front_and_back)
+TEST(test_push_front)
+{
+    List<int> *l1 = new List<int>();
+    l1->push_front(10);
+    ASSERT_EQUAL(l1->front(), 10);
+    ASSERT_EQUAL(l1->back(), 10);
+
+    l1->push_front(30);
+    ASSERT_EQUAL(l1->front(), 30);
+    ASSERT_EQUAL(l1->back(), 10);
+
+    l1->push_front(50);
+    ASSERT_EQUAL(l1->front(), 50);
+    ASSERT_EQUAL(l1->back(), 10);
+
+    delete l1;
+}
+
+TEST(test_push_back)
 {
     List<int> *l1 = new List<int>();
     l1->push_back(10);
-    ASSERT_EQUAL(l1->front(), 10);
     ASSERT_EQUAL(l1->back(), 10);
+    ASSERT_EQUAL(l1->front(), 10);
 
     l1->push_back(30);
     ASSERT_EQUAL(l1->front(), 10);
     ASSERT_EQUAL(l1->back(), 30);
 
     l1->push_back(50);
+    ASSERT_EQUAL(l1->front(), 10);
     ASSERT_EQUAL(l1->back(), 50);
 
     delete l1;
 }
 
-TEST(test_pop_front_back)
+TEST(test_pop_front)
 {
+    List<int> *l1 = new List<int>();
+    l1->push_back(10);
+    l1->push_back(30);
+    l1->push_back(50);
+
+    ASSERT_EQUAL(l1->front(), 10);
+    ASSERT_EQUAL(l1->back(), 50);
+
+    l1->pop_front();
+    ASSERT_EQUAL(l1->front(), 30);
+
+    l1->pop_front();
+    ASSERT_EQUAL(l1->front(), 50);
+
+    delete l1;
+}
+
+TEST(test_pop_back)
+{
+
     List<int> *l1 = new List<int>();
     l1->push_back(10);
     l1->push_back(30);
@@ -37,21 +76,31 @@ TEST(test_pop_front_back)
     l1->pop_back();
     ASSERT_EQUAL(l1->back(), 30);
 
-    l1->pop_front();
-    ASSERT_EQUAL(l1->front(), 30);
+    l1->pop_back();
+    ASSERT_EQUAL(l1->back(), 10);
 
     delete l1;
 }
 
-TEST(test_size_empty)
+TEST(test_size)
 {
     List<int> *l1 = new List<int>();
     ASSERT_EQUAL(l1->size(), 0);
-    ASSERT_TRUE(l1->empty());
     l1->push_back(10);
     l1->push_back(30);
     l1->push_back(50);
     ASSERT_EQUAL(l1->size(), 3);
+
+    delete l1;
+}
+
+TEST(test_empty)
+{
+
+    List<int> *l1 = new List<int>();
+    ASSERT_TRUE(l1->empty());
+    l1->push_back(10);
+    ASSERT_FALSE(l1->empty());
 
     delete l1;
 }
@@ -102,28 +151,60 @@ TEST(test_copy)
     delete l2;
 }
 
-// TEST(test_begin_end_operators)
-// {
-//     List<int> *l1 = new List<int>();
-//     l1->push_back(10);
-//     bool result = (l1->begin() != l1->end());
-//     ASSERT_EQUAL(result, true);
+TEST(test_begin)
+{
+    List<int> *l1 = new List<int>();
+    l1->push_back(10);
+    l1->push_back(10);
+    l1->push_back(10);
+    l1->push_back(10);
+    int count = 0;
+    for (List<int>::Iterator i = l1->begin(); i != l1->end(); ++i)
+    {
+        count++;
+    }
 
-//     delete l1;
-// }
+    ASSERT_EQUAL(count, 4);
+
+    delete l1;
+}
+
+TEST(test_end)
+{
+
+    List<int> *l1 = new List<int>();
+    l1->push_back(10);
+    l1->push_back(10);
+    l1->push_back(10);
+    l1->push_back(10);
+    int count = 0;
+    for (List<int>::Iterator i = l1->begin(); i != l1->end(); ++i)
+    {
+        count++;
+    }
+
+    ASSERT_EQUAL(count, 4);
+
+    delete l1;
+}
 
 TEST(test_erase)
 {
     List<int> *l1 = new List<int>();
     l1->push_back(10);
+    List<int>::Iterator it = l1->begin();
+    l1->erase(it);
+    ASSERT_TRUE(l1->empty());
+
     l1->push_back(30);
     l1->push_back(50);
-    List<int>::Iterator it = l1->begin();
+    l1->push_back(70);
+    it = l1->begin();
 
     l1->erase(it);
-    ASSERT_EQUAL(l1->front(), 30);
+    ASSERT_EQUAL(l1->front(), 50);
     l1->erase(l1->end());
-    ASSERT_EQUAL(l1->back(), 30);
+    ASSERT_EQUAL(l1->back(), 50);
 
     delete l1;
 }
@@ -131,9 +212,12 @@ TEST(test_erase)
 TEST(test_insert)
 {
     List<int> *l1 = new List<int>();
+
     l1->push_back(10);
     l1->push_back(30);
     l1->push_back(50);
+    l1->push_back(70);
+
     l1->insert(l1->begin(), 100);
     ASSERT_EQUAL(l1->front(), 100);
 
@@ -141,7 +225,7 @@ TEST(test_insert)
     ASSERT_EQUAL(l1->back(), 200);
 
     l1->pop_back();
-    ASSERT_EQUAL(l1->back(), 50);
+    ASSERT_EQUAL(l1->back(), 70);
 
     delete l1;
 }
