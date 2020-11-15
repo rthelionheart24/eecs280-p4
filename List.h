@@ -94,7 +94,6 @@ public:
       first->prev = new_node;
       first = new_node;
     }
-    new_node = nullptr;
   }
 
   //EFFECTS:  inserts datum into the back of the list
@@ -116,7 +115,6 @@ public:
       last->next = new_node;
       last = new_node;
     }
-    new_node = nullptr;
   }
 
   //REQUIRES: list is not empty
@@ -307,6 +305,7 @@ public:
 
     if (size() == 1)
     {
+      delete first;
       first = nullptr;
       last = nullptr;
     }
@@ -314,19 +313,23 @@ public:
     {
       if (i.node_ptr == first)
       {
-        first = first->next;
+        Node *n = first;
+        first = n->next;
         first->prev = nullptr;
+        delete n;
       }
       else if (i.node_ptr == nullptr)
       {
-        last = last->prev;
+        Node *n = last;
+        last = n->prev;
         last->next = nullptr;
+        delete n;
       }
       else
       {
         Node *p = (i.node_ptr)->prev;
         Node *n = (i.node_ptr)->next;
-        //delete i.node_ptr;
+        delete i.node_ptr;
         p->next = n;
         n->prev = p;
       }
